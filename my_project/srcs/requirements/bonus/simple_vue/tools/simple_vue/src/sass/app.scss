@@ -1,0 +1,85 @@
+//
+@use "sass:math";
+@import '~materialize-css/dist/css/materialize.min.css';
+@import 'https://fonts.googleapis.com/icon?family=Material+Icons';
+
+
+
+$total-indent: 15;
+
+@function column-indent-int($total-indent) {
+	@return ($total-indent); 
+}
+@function column-indent($total-indent) {  
+	@return percentage($total-indent);  
+}
+@function column-indent-em($total-indent) {
+	@return ($total-indent)*1em; 
+}
+@function column-indent-px($total-indent) {
+	@return ($total-indent)*1px; 
+}
+
+@for $i from 0 through $total-indent {  
+	.p-#{$i} { padding: math.div(column-indent($i), 100) };
+	.pt-#{$i} { padding-top: math.div(column-indent($i), 100) };
+	.pb-#{$i} { padding-bottom: math.div(column-indent($i), 100) };
+	.pl-#{$i} { padding-left: math.div(column-indent($i), 100) };
+	.pr-#{$i} { padding-right: math.div(column-indent($i), 100) };  
+}
+
+@for $i from 0 through $total-indent {  
+	.m-#{$i} { margin: math.div(column-indent($i), 100) };
+	.mt-#{$i} { margin-top: math.div(column-indent($i), 100) };
+	.mb-#{$i} { margin-bottom: math.div(column-indent($i), 100) };
+	.ml-#{$i} { margin-left: math.div(column-indent($i), 100) };
+	.mr-#{$i} { margin-right: math.div(column-indent($i), 100) };   
+}
+
+@for $i from 0 through $total-indent {  
+	.p-em-#{$i} { padding: column-indent-em($i) };
+	.pt-em-#{$i} { padding-top: column-indent-em($i) };
+	.pb-em-#{$i} { padding-bottom: column-indent-em($i) };
+	.pl-em-#{$i} { padding-left: column-indent-em($i) };
+	.pr-em-#{$i} { padding-right: column-indent-em($i) };  
+}
+
+@for $i from 0 through $total-indent {  
+	.m-em-#{$i} { margin: column-indent-em($i) };
+	.mt-em-#{$i} { margin-top: column-indent-em($i) };
+	.mb-em-#{$i} { margin-bottom: column-indent-em($i) };
+	.ml-em-#{$i} { margin-left: column-indent-em($i) };
+	.mr-em-#{$i} { margin-right: column-indent-em($i) };   
+}
+
+.rel {
+	position: relative;
+}
+.abs {
+	position: absolute;
+}
+.block {
+	display: block;
+}
+.inline-block {
+	display: inline-block;
+}
+.ml-px--20 {
+	margin-left: -20px;
+}
+.pl-px-20 {
+	padding-left: 20px;
+}
+.flex-center {
+	display: flex;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	align-items: center;
+}
+.flex-center-between {
+	@extend .flex-center;
+	justify-content: space-between;
+}
+.text-center {
+	text-align: center;
+}

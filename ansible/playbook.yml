@@ -4,6 +4,7 @@
   roles:
     - ping
     - docker
+    - deploy
 
     
     

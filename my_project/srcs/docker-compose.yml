@@ -1,0 +1,160 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  mariadb:
+    build:
+      context: ./requirements/mariadb/
+      dockerfile: Dockerfile
+    container_name: mariadb
+    image: mariadb
+    restart: always
+    env_file: .env
+    environment:
+      - MYSQL_DATABASE=wordpress
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - app-network
+
+  wordpress:
+    depends_on:
+      - mariadb
+    build:
+      context: ./requirements/wordpress/
+      dockerfile: Dockerfile
+    container_name: wordpress
+    image: wordpress
+    env_file: .env
+    environment:
+      - WORDPRESS_DB_HOST=mariadb:3306
+      - WORDPRESS_DB_USER=$MYSQL_USER
+      - WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
+      - WORDPRESS_DB_NAME=wordpress
+      - REDIS_HOST=redis
+    restart: always
+    volumes:
+      - wordpress:/var/www/html
+    networks:
+      - app-network
+
+  adminer:
+    depends_on:
+      - wordpress
+    build:
+      context: ./requirements/bonus/adminer/
+      dockerfile: Dockerfile
+    container_name: adminer
+    image: adminer
+    env_file: .env
+    restart: always
+    volumes:
+      - adminer:/var/www/adminer
+    networks:
+      - app-network
+
+  simple_vue:
+    depends_on:
+      - adminer
+    build:
+      context: ./requirements/bonus/simple_vue/
+      dockerfile: Dockerfile
+    container_name: simple_vue
+    image: simple_vue
+    env_file: .env
+    restart: always
+    volumes:
+      - simple_vue:/var/www/simple_vue
+    networks:
+      - app-network
+
+  nginx:
+    depends_on:
+      - simple_vue
+    build:
+      context: ./requirements/nginx/
+      dockerfile: Dockerfile
+    container_name: nginx
+    image: nginx
+    restart: always
+    ports:
+      - "443:443"
+      - "4000:4000"
+      - "5000:5000"
+    volumes:
+      - wordpress:/var/www/html
+    networks:
+      - app-network
+
+  ftp:
+    depends_on:
+      - nginx
+    build:
+      context: ./requirements/bonus/ftp/
+      dockerfile: Dockerfile
+    container_name: ftp
+    image: ftp
+    env_file: .env
+    restart: always
+    volumes:
+      - wordpress:/var/www/html
+    networks:
+      - app-network
+  
+  redis:
+    depends_on:
+      - ftp
+    build:
+      context: ./requirements/bonus/redis/
+      dockerfile: Dockerfile
+    container_name: redis
+    image: redis
+    env_file: .env
+    restart: always
+    networks:
+      - app-network
+
+  ssh:
+    depends_on:
+      - redis
+    build:
+      context: ./requirements/bonus/ssh/
+      dockerfile: Dockerfile
+    container_name: ssh
+    image: ssh
+    env_file: .env
+    restart: always
+    volumes:
+      - wordpress:/var/www/html
+      - simple_vue:/var/www/simple_vue
+      - adminer:/var/www/adminer
+    networks:
+      - app-network
+
+volumes:
+  wordpress:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '~/data/wordpress'
+  dbdata:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '~/data/dbdata'
+  simple_vue:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '~/data/simple_vue'
+  adminer:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '~/data/adminer'
+
+networks:
+  app-network:
+    driver: bridge

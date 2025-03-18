@@ -1,0 +1,24 @@
+---
+# tasks file for ./roles/deploy
+
+- name: Install make
+  apt:
+    name: build-essential
+    state: present
+  become: true
+
+- name: Copy project to cloud
+  become: true
+  copy:
+    src: ../my_project/
+    dest: /home/
+    mode: '0755'
+    remote_src: no
+
+
+- name: Run Docker Compose
+  shell:
+    make
+  args:
+    chdir: /home/
+  
