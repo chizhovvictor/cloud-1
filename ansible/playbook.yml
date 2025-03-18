@@ -1,0 +1,9 @@
+---
+- name: Test connection to my cloud
+  hosts: all
+  roles:
+    - ping
+    - docker
+
+    
+    
