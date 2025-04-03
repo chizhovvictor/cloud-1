@@ -77,10 +77,11 @@ services:
     restart: always
     ports:
       - "443:443"
-      - "4000:4000"
-      - "5000:5000"
+      - "127.0.0.1:4000:4000"
+      - "127.0.0.1:5000:5000"
     volumes:
       - wordpress:/var/www/html
+      - /etc/letsencrypt:/etc/letsencrypt
     networks:
       - app-network
 
