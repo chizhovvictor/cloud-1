@@ -3,10 +3,10 @@
   hosts: all
   roles:
     - ping
-    #- iptables
     - docker
+    - tls
     - deploy
-    #- tls
+    
 
     
     

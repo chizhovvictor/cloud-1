@@ -2,44 +2,77 @@ resource "digitalocean_droplet" "web" {
   image  = "ubuntu-20-04-x64"
   name   = "cloud-1"
   region = "nyc3"
-  size   = "s-1vcpu-1gb"
+  size   = "s-4vcpu-8gb"
   ssh_keys = [
-    "33:36:79:70:9b:41:73:f1:b1:87:d4:94:cb:44:8e:23"
+    "33:36:79:70:9b:41:73:f1:b1:87:d4:94:cb:44:8e:23",
+    "79:27:00:ff:c0:a6:5e:d3:10:d7:ac:06:ac:f0:8f:4a"
   ]
   
 }
 
 
-# resource "digitalocean_firewall" "web_firewall" {
-#   name = "web-firewall"
+resource "digitalocean_firewall" "web" {
+  name = "only-22-80-and-443"
 
-#   droplet_ids = [
-#     digitalocean_droplet.web.id
-#   ]
+  droplet_ids = [digitalocean_droplet.web.id]
 
-#   # Правила для порта 22 (SSH)
-#   inbound_rule {
-#     protocol         = "tcp"
-#     port_range       = "22"
-#     source_addresses = ["0.0.0.0/0"]
-#   }
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "22"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
 
-#   # Правила для порта 443 (HTTPS)
-#   inbound_rule {
-#     protocol         = "tcp"
-#     port_range       = "443"
-#     source_addresses = ["0.0.0.0/0"]
-#   }
+  # HTTP
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "80"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+  
+  # HTTPS
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "443"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
 
-#   outbound_rule {
-#     protocol              = "icmp"
-#     destination_addresses = ["0.0.0.0/0", "::/0"]
-#   }
+  # ICMP (ping, traceroute)
+  # inbound_rule {
+  #   protocol         = "icmp"
+  #   source_addresses = ["0.0.0.0/0", "::/0"]
+  # }
 
-#   outbound_rule {
-#     protocol              = "tcp"
-#     port_range            = "0-65535"
-#     destination_addresses = ["0.0.0.0/0"]
-#   }
-# 
-# }
+  # DNS
+  outbound_rule {
+    protocol              = "udp"
+    port_range            = "53"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  outbound_rule {
+    protocol              = "tcp"
+    port_range            = "53"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  # HTTPS (curl, apt, composer, git и т.п.)
+  outbound_rule {
+    protocol              = "tcp"
+    port_range            = "443"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  # HTTP (если нужно скачивать с http-сайтов — не обязательно)
+  outbound_rule {
+    protocol              = "tcp"
+    port_range            = "80"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  # ICMP (ping, traceroute)
+  # outbound_rule {
+  #   protocol              = "icmp"
+  #   destination_addresses = ["0.0.0.0/0", "::/0"]
+  # }
+
+}

@@ -2,14 +2,9 @@
 # tasks file for roles/tls
 
 - name: Install Certbot
-  command: snap install --classic certbot
+  command: apt install -y certbot python3-certbot-nginx
 
-- name: Create symlink for certbot
-  command: ln -s /snap/bin/certbot /usr/bin/certbot
-  args:
-    creates: /usr/bin/certbot
-
-- name: Configure Cerbot
-  command: certbot certonly --standalone
+- name: Obtain SSL certificate with Certbot for nginx
+  command: certbot --nginx -d lolcloud.duckdns.org -d www.lolcloud.duckdns.org --non-interactive --agree-tos --email admin@lolcloud.duckdns.org --redirect
 
 

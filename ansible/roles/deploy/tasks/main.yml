@@ -15,6 +15,16 @@
     mode: '0755'
     remote_src: no
 
+- name: Stop system nginx
+  service:
+    name: nginx
+    state: stopped
+
+- name: Disable system nginx
+  systemd:
+    name: nginx
+    enabled: no
+
 
 - name: Run Docker Compose
   shell:
