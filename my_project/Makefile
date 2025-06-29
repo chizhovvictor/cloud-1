@@ -6,7 +6,7 @@ all:
 	mkdir -p ~/data/phpmyadmin
 	docker compose --file srcs/docker-compose.yml build
 	docker compose --file srcs/docker-compose.yml up -d
-	bash srcs/requirements/tools/host.sh add
+
 
 clean:
 	docker compose --file srcs/docker-compose.yml down

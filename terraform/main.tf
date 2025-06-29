@@ -43,13 +43,6 @@ resource "digitalocean_firewall" "web" {
   #   source_addresses = ["0.0.0.0/0", "::/0"]
   # }
 
-  # 5050
-  inbound_rule {
-    protocol         = "tcp"
-    port_range       = "5050"
-    source_addresses = ["0.0.0.0/0", "::/0"]
-  }
-
   # DNS
   outbound_rule {
     protocol              = "udp"

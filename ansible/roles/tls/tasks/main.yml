@@ -5,6 +5,6 @@
   command: apt install -y certbot python3-certbot-nginx
 
 - name: Obtain SSL certificate with Certbot for nginx
-  command: certbot --nginx -d lol-cloud.duckdns.org -d www.lol-cloud.duckdns.org --non-interactive --agree-tos --email admin@lolcloud.duckdns.org --redirect
+  command: certbot --nginx -d lol-cloud.duckdns.org -d www.lol-cloud.duckdns.org -d pma.lol-cloud.duckdns.org --non-interactive --agree-tos --email admin@lolcloud.duckdns.org --redirect
 
 
