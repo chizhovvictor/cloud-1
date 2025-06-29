@@ -3,8 +3,7 @@ include srcs/.env
 all:
 	mkdir -p ~/data/dbdata
 	mkdir -p ~/data/wordpress
-	mkdir -p ~/data/simple_vue
-	mkdir -p ~/data/adminer
+	mkdir -p ~/data/phpmyadmin
 	docker compose --file srcs/docker-compose.yml build
 	docker compose --file srcs/docker-compose.yml up -d
 	bash srcs/requirements/tools/host.sh add

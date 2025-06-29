@@ -38,8 +38,8 @@ define( 'DB_CHARSET', 'utf8' );
 define( 'DB_COLLATE', '' );
 
 /** Redis hostname */
-define( 'WP_REDIS_HOST', '$REDIS_HOST' );
-define( 'WP_REDIS_PASSWORD', '$REDIS_PASSWORD' );
+// define( 'WP_REDIS_HOST', '$REDIS_HOST' );
+// define( 'WP_REDIS_PASSWORD', '$REDIS_PASSWORD' );
 
 /**#@+
  * Authentication unique keys and salts.

@@ -12,8 +12,6 @@ if [ "$1" = 'add' ]; then
 	echo -e "# DOCKER INCEPTION START" | sudo tee -a /etc/hosts > /dev/null
 	echo "$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nginx)	tgildero.42.fr" | sudo tee -a /etc/hosts > /dev/null
 	echo "$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mariadb)	mariadb.42.fr" | sudo tee -a /etc/hosts > /dev/null
- 	echo "$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ftp)	ftp.42.fr" | sudo tee -a /etc/hosts > /dev/null
-	echo "$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ssh)	ssh.42.fr" | sudo tee -a /etc/hosts > /dev/null
 	echo -e "# DOCKER INCEPTION END" | sudo tee -a /etc/hosts > /dev/null
 fi
 

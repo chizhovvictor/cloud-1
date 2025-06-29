@@ -1,15 +1,17 @@
 version: "3.9"  # optional since v1.27.0
 services:
   mariadb:
-    build:
-      context: ./requirements/mariadb/
-      dockerfile: Dockerfile
-    container_name: mariadb
     image: mariadb
     restart: always
-    env_file: .env
+    env_file:
+      - ".env"
     environment:
-      - MYSQL_DATABASE=wordpress
+      MARIADB_DATABASE: ${MYSQL_DATABASE}
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MARIADB_USER: ${MYSQL_USER}
+      MARIADB_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
     volumes:
       - dbdata:/var/lib/mysql
     networks:
@@ -18,57 +20,39 @@ services:
   wordpress:
     depends_on:
       - mariadb
-    build:
-      context: ./requirements/wordpress/
-      dockerfile: Dockerfile
-    container_name: wordpress
-    image: wordpress
-    env_file: .env
-    environment:
-      - WORDPRESS_DB_HOST=mariadb:3306
-      - WORDPRESS_DB_USER=$MYSQL_USER
-      - WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
-      - WORDPRESS_DB_NAME=wordpress
-      - REDIS_HOST=redis
+    image: wordpress:fpm-alpine
     restart: always
+    env_file:
+      - ".env"
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
     volumes:
       - wordpress:/var/www/html
     networks:
       - app-network
 
-  adminer:
+  phpmyadmin:
     depends_on:
-      - wordpress
-    build:
-      context: ./requirements/bonus/adminer/
-      dockerfile: Dockerfile
-    container_name: adminer
-    image: adminer
-    env_file: .env
+      - mariadb
+    image: phpmyadmin
     restart: always
+    ports:
+      - 5050:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mariadb
+      - PMA_PORT=3306
+      - PMA_USER=${MYSQL_USER}
+      - PMA_PASSWORD=${MYSQL_PASSWORD}
     volumes:
-      - adminer:/var/www/adminer
-    networks:
-      - app-network
-
-  simple_vue:
-    depends_on:
-      - adminer
-    build:
-      context: ./requirements/bonus/simple_vue/
-      dockerfile: Dockerfile
-    container_name: simple_vue
-    image: simple_vue
-    env_file: .env
-    restart: always
-    volumes:
-      - simple_vue:/var/www/simple_vue
+      - phpmyadmin:/var/www/phpmyadmin
     networks:
       - app-network
 
   nginx:
-    depends_on:
-      - simple_vue
     build:
       context: ./requirements/nginx/
       dockerfile: Dockerfile
@@ -77,58 +61,12 @@ services:
     restart: always
     ports:
       - "443:443"
-      - "127.0.0.1:4000:4000"
-      - "127.0.0.1:5000:5000"
     volumes:
       - wordpress:/var/www/html
       - /etc/letsencrypt:/etc/letsencrypt
     networks:
       - app-network
 
-  ftp:
-    depends_on:
-      - nginx
-    build:
-      context: ./requirements/bonus/ftp/
-      dockerfile: Dockerfile
-    container_name: ftp
-    image: ftp
-    env_file: .env
-    restart: always
-    volumes:
-      - wordpress:/var/www/html
-    networks:
-      - app-network
-  
-  redis:
-    depends_on:
-      - ftp
-    build:
-      context: ./requirements/bonus/redis/
-      dockerfile: Dockerfile
-    container_name: redis
-    image: redis
-    env_file: .env
-    restart: always
-    networks:
-      - app-network
-
-  ssh:
-    depends_on:
-      - redis
-    build:
-      context: ./requirements/bonus/ssh/
-      dockerfile: Dockerfile
-    container_name: ssh
-    image: ssh
-    env_file: .env
-    restart: always
-    volumes:
-      - wordpress:/var/www/html
-      - simple_vue:/var/www/simple_vue
-      - adminer:/var/www/adminer
-    networks:
-      - app-network
 
 volumes:
   wordpress:
@@ -143,19 +81,14 @@ volumes:
       type: 'none'
       o: 'bind'
       device: '~/data/dbdata'
-  simple_vue:
+  phpmyadmin:
     driver: local
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: '~/data/simple_vue'
-  adminer:
-    driver: local
-    driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: '~/data/adminer'
+      device: '~/data/phpmyadmin'
 
 networks:
   app-network:
     driver: bridge
+
